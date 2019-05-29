@@ -1,0 +1,84 @@
+<?php
+
+/**
+ * @file
+ * Helper functionality.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\views\ViewExecutable;
+
+function _helper_get_associative_array_from_view($view_name, $display_id, $options, $args) {
+  $temp = [];
+  $results = views_get_view_result($view_name, $display_id, $args);
+
+  foreach($results as $row) {
+    $id = $row->_relationship_entities['field_tags']->id();
+    if (array_key_exists($id, $options)) {
+      $temp[$id] = $options[$id];
+    }
+  }
+
+  return array_keys(array_diff_key($options, $temp));
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function helper_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $view_ids = ['articles'];
+  $view = $form_state->getStorage('view');
+  if ($form_id == 'views_exposed_form' && in_array($view['view']->id(), $view_ids) && $view['view']->current_display == 'page') {
+    $input = &$form_state->getUserInput();
+    $selected = $input['tags'];
+
+    if ($selected) {
+      $options = $form['tags']['#options'];
+
+      $disabled = _helper_get_associative_array_from_view(
+        'articles',
+        'page_copy',
+        $options,
+        $selected
+      );
+
+      if ($disabled) {
+        foreach ($disabled as $key) {
+          $form['tags'][$key] = ['#disabled' => TRUE];
+        }
+
+        $form['#attached']['library'][] = 'helper/general';
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_post_execute().
+ */
+function helper_views_post_execute(ViewExecutable $view) {
+  $output = '';
+  if ($view->id() == 'articles' && $view->current_display == 'page') {
+    $tids = [];
+    foreach ($view->exposed_data['tags'] as $tid) {
+      if ($tid) {
+        $tids[] = $tid;
+      }
+    }
+
+    if ($tids) {
+      $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadMultiple($tids);
+      foreach ($terms as $term) {
+        $output .= '<span data-tid="' . $term->tid->value . '">' . $term->name->value . '</span>';
+      }
+
+      $rendered = [
+        '#type' => 'markup',
+        '#markup' => $output,
+        '#prefix' => '<div class="selected-wrapper">',
+        '#suffix' => '</div>',
+      ];
+    }
+    $view->attachment_before = $rendered;
+  }
+}

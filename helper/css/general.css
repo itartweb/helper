@@ -1,0 +1,35 @@
+.selected-wrapper span {
+  display: inline-block;
+  font-size: 14px;
+  font-family: WorkSans-Regular,Arial,Helvetica,sans-serif;
+  color: #fff;
+  background-color: #941838;
+  border-radius: 5px;
+  line-height: 1;
+  padding: 7px 30px 7px 20px;
+  margin: 5px 3px;
+  position: relative;
+  cursor: pointer;
+}
+
+.view-articles .views-exposed-form .js-form-item label.option {
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.view-articles .views-exposed-form .js-form-item label.option {
+  display: inline-block;
+  font-size: 14px;
+  font-family: WorkSans-Regular,Arial,Helvetica,sans-serif;
+  color: #751931;
+  background-color: #fff;
+  border-radius: 5px;
+  line-height: 1;
+  padding: 8px 12px 6px;
+  margin: 5px 3px;
+}
+.view-articles .views-exposed-form .js-form-item label.option.disable {
+  background-color: transparent;
+  border: 1px solid #a9a6a4;
+  color: #999;
+  cursor: default;
+}

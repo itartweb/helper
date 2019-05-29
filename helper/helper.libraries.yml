@@ -1,0 +1,10 @@
+general:
+  version: 1.x
+  css:
+    theme:
+      css/general.css: {}
+  js:
+    js/general.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery.once
